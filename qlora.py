@@ -519,11 +519,11 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     elif args.dataset == 'longform':
         dataset = load_dataset("akoksal/LongForm")
     elif args.dataset == 'my-data':
-        dataset = load_dataset("json", data_files="conversations.json")
+        dataset = load_dataset("json", data_files="tit.json")
         dataset = dataset.map(lambda x: {
-        'input': '### Instruction: '+ x['question'],
-        'output': '### Response: '+ x['answer']
-        }, remove_columns=['question', 'answer'])
+        'input': '### Instruction: Give an appropriate title for the text that follows. ### Text: '+ x['text'],
+        'output': '### Title: '+ x['title']
+        }, remove_columns=['text', 'title'])
     else:
         raise NotImplementedError(f"Dataset {args.dataset} not implemented yet.")
 
