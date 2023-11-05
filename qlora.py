@@ -518,7 +518,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     elif args.dataset == 'longform':
         dataset = load_dataset("akoksal/LongForm")
     elif args.dataset == 'my-data':
-        dataset = load_dataset("json", data_files="tit.json")
+        dataset = load_dataset("json", data_files="tit.jsonl")
         dataset = dataset.map(lambda x: {
         'input': '### Instruction: Give an appropriate title for the text that follows. ### Text: '+ x['text'],
         'output': '### Title: '+ x['title']
