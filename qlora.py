@@ -152,7 +152,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         metadata={"help":"Lora dropout."}
     )
     max_memory_MB: int = field(
-        default=80000,
+        default=14000,
         metadata={"help": "Free memory per gpu."}
     )
     report_to: str = field(
@@ -175,8 +175,8 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     logging_steps: int = field(default=10, metadata={"help": 'The frequency of update steps after which to log the loss'})
     group_by_length: bool = field(default=True, metadata={"help": 'Group sequences into batches with same length. Saves memory and speeds up training considerably.'})
     save_strategy: str = field(default='steps', metadata={"help": 'When to save checkpoints'})
-    save_steps: int = field(default=250, metadata={"help": 'How often to save a model'})
-    save_total_limit: int = field(default=40, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
+    save_steps: int = field(default=1000, metadata={"help": 'How often to save a model'})
+    save_total_limit: int = field(default=2, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
 
 @dataclass
 class GenerationArguments:
@@ -184,7 +184,7 @@ class GenerationArguments:
     # https://huggingface.co/docs/transformers/main_classes/text_generation#transformers.GenerationConfig
     # Length arguments
     max_new_tokens: Optional[int] = field(
-        default=256,
+        default=4095,
         metadata={"help": "Maximum number of new tokens to be generated in evaluation or prediction loops"
                           "if predict_with_generate is set."}
     )
