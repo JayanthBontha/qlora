@@ -518,11 +518,11 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     elif args.dataset == 'longform':
         dataset = load_dataset("akoksal/LongForm")
     elif args.dataset == 'my-data':
-        dataset = load_dataset("json", data_files="tit.jsonl")
+        dataset = load_dataset("json", data_files="sum.jsonl")
         dataset = dataset.map(lambda x: {
-        'input': '### Instruction: Give an appropriate title for the text that follows. ### Text: '+ x['text'],
-        'output': '### Title: '+ x['title']
-        }, remove_columns=['text', 'title'])
+        'input': '### Instruction: Summarize the following text. ### Text: '+ x['text'],
+        'output': '### Sumaary: '+ x['summary']+"</s>"
+        }, remove_columns=['text', 'summary'])
     else:
         raise NotImplementedError(f"Dataset {args.dataset} not implemented yet.")
 
@@ -536,6 +536,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
                 test_size=args.eval_dataset_size, shuffle=True, seed=42
             )
             eval_dataset = dataset['test']
+            print("Length of eval dataset:",len(eval_dataset))
         if args.max_eval_samples is not None and len(eval_dataset) > args.max_eval_samples:
             eval_dataset = eval_dataset.select(range(args.max_eval_samples))
         if args.group_by_length:
@@ -585,7 +586,8 @@ def train():
     args = argparse.Namespace(
         **vars(model_args), **vars(data_args), **vars(training_args)
     )
-    
+    args.do_Eval=True
+    args.bits=4
 
     checkpoint_dir, completed_training = get_last_checkpoint(args.output_dir)
     if completed_training:
