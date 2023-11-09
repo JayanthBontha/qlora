@@ -259,6 +259,7 @@ def get_accelerate_model(args, checkpoint_dir):
 
     if args.full_finetune: assert args.bits in [16, 32]
     device_map = {"": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))}
+    print("devices: ",device_map)
     print(f'loading base model {args.model_name_or_path}...')
     compute_dtype = (torch.float16 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32))
     model = AutoModelForCausalLM.from_pretrained(
