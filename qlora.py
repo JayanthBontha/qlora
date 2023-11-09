@@ -258,14 +258,14 @@ def get_accelerate_model(args, checkpoint_dir):
     max_memory = {i: max_memory for i in range(n_gpus)}
 
     if args.full_finetune: assert args.bits in [16, 32]
-
+    device_map = {"": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))}
     print(f'loading base model {args.model_name_or_path}...')
     compute_dtype = (torch.float16 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32))
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name_or_path,
         load_in_4bit=args.bits == 4,
         load_in_8bit=args.bits == 8,
-        device_map='auto',
+        device_map=device_map,
         max_memory=max_memory,
         quantization_config=BitsAndBytesConfig(
             load_in_4bit=args.bits == 4,
