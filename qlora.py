@@ -51,7 +51,7 @@ DEFAULT_PAD_TOKEN = "[PAD]"
 @dataclass
 class ModelArguments:
     model_name_or_path: Optional[str] = field(
-        default="EleutherAI/pythia-12b"
+        default="./trained_model/"
     )
     trust_remote_code: Optional[bool] = field(
         default=False,
@@ -78,15 +78,15 @@ class DataArguments:
         },
     )
     source_max_len: int = field(
-        default=512,
+        default=4096,
         metadata={"help": "Maximum source sequence length. Sequences will be right padded (and possibly truncated)."},
     )
     target_max_len: int = field(
-        default=1024,
+        default=2350,
         metadata={"help": "Maximum target sequence length. Sequences will be right padded (and possibly truncated)."},
     )
     dataset: str = field(
-        default='alpaca',
+        default='my-data',
         metadata={"help": "Which dataset to finetune on. See datamodule for options."}
     )
 
@@ -152,7 +152,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         metadata={"help":"Lora dropout."}
     )
     max_memory_MB: int = field(
-        default=14000,
+        default=23000,
         metadata={"help": "Free memory per gpu."}
     )
     report_to: str = field(
@@ -176,7 +176,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     group_by_length: bool = field(default=True, metadata={"help": 'Group sequences into batches with same length. Saves memory and speeds up training considerably.'})
     save_strategy: str = field(default='steps', metadata={"help": 'When to save checkpoints'})
     save_steps: int = field(default=10, metadata={"help": 'How often to save a model'})
-    save_total_limit: int = field(default=2, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
+    save_total_limit: int = field(default=10, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
 
 @dataclass
 class GenerationArguments:
@@ -189,7 +189,7 @@ class GenerationArguments:
                           "if predict_with_generate is set."}
     )
     min_new_tokens : Optional[int] = field(
-        default=None,
+        default=286,
         metadata={"help": "Minimum number of new tokens to generate."}
     )
 
@@ -382,7 +382,7 @@ class DataCollatorForCausalLM(object):
     def __call__(self, instances: Sequence[Dict]) -> Dict[str, torch.Tensor]:
         # Extract elements
         sources = [example['input'] for example in instances]
-        targets = [f"{example['output']}{self.tokenizer.eos_token}" for example in instances]
+        targets = [f"{example['output']}" for example in instances]
         # Tokenize
         tokenized_sources_with_prompt = self.tokenizer(
             sources,
@@ -587,7 +587,6 @@ def train():
         **vars(model_args), **vars(data_args), **vars(training_args)
     )
     args.do_Eval=True
-    args.bits=4
 
     checkpoint_dir, completed_training = get_last_checkpoint(args.output_dir)
     if completed_training:
