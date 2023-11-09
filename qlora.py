@@ -518,7 +518,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     elif args.dataset == 'longform':
         dataset = load_dataset("akoksal/LongForm")
     elif args.dataset == 'my-data':
-        dataset = load_dataset("json", data_files="sum.jsonl")
+        dataset = load_dataset("json", data_files="/kaggle/input/sum-jsonl/sum.jsonl")
         dataset = dataset.map(lambda x: {
         'input': '### Instruction: Summarize the following text. ### Text: '+ x['text'],
         'output': '### Sumaary: '+ x['summary']+"</s>"
