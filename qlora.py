@@ -151,9 +151,9 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         default=0.0,
         metadata={"help":"Lora dropout."}
     )
-    max_memory_MB: int = field(
-        default=23000,
-        metadata={"help": "Free memory per gpu."}
+    max__MB: int = field(
+        default=47000,
+        metadata={"help": "Free  per gpu."}
     )
     report_to: str = field(
         default='none',
@@ -161,9 +161,9 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     )
     output_dir: str = field(default='./output', metadata={"help": 'The output dir for logs and checkpoints'})
     optim: str = field(default='paged_adamw_32bit', metadata={"help": 'The optimizer to be used'})
-    per_device_train_batch_size: int = field(default=1, metadata={"help": 'The training batch size per GPU. Increase for better speed.'})
-    gradient_accumulation_steps: int = field(default=16, metadata={"help": 'How many gradients to accumulate before to perform an optimizer step'})
-    max_steps: int = field(default=10000, metadata={"help": 'How many optimizer update steps to take'})
+    per_device_train_batch_size: int = field(default=4, metadata={"help": 'The training batch size per GPU. Increase for better speed.'})
+    gradient_accumulation_steps: int = field(default=8, metadata={"help": 'How many gradients to accumulate before to perform an optimizer step'})
+    max_steps: int = field(default=2000, metadata={"help": 'How many optimizer update steps to take'})
     weight_decay: float = field(default=0.0, metadata={"help": 'The L2 weight decay rate of AdamW'}) # use lora dropout instead for regularization if needed
     learning_rate: float = field(default=0.0002, metadata={"help": 'The learnign rate'})
     remove_unused_columns: bool = field(default=False, metadata={"help": 'Removed unused columns. Needed to make this codebase work.'})
@@ -173,7 +173,7 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     lr_scheduler_type: str = field(default='constant', metadata={"help": 'Learning rate schedule. Constant a bit better than cosine, and has advantage for analysis'})
     warmup_ratio: float = field(default=0.03, metadata={"help": 'Fraction of steps to do a warmup for'})
     logging_steps: int = field(default=10, metadata={"help": 'The frequency of update steps after which to log the loss'})
-    group_by_length: bool = field(default=True, metadata={"help": 'Group sequences into batches with same length. Saves memory and speeds up training considerably.'})
+    group_by_length: bool = field(default=True, metadata={"help": 'Group sequences into batches with same length. Saves  and speeds up training considerably.'})
     save_strategy: str = field(default='steps', metadata={"help": 'When to save checkpoints'})
     save_steps: int = field(default=10, metadata={"help": 'How often to save a model'})
     save_total_limit: int = field(default=10, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
@@ -254,8 +254,8 @@ class SavePeftModelCallback(transformers.TrainerCallback):
 def get_accelerate_model(args, checkpoint_dir):
 
     n_gpus = torch.cuda.device_count()
-    max_memory = f'{args.max_memory_MB}MB'
-    max_memory = {i: max_memory for i in range(n_gpus)}
+    max_ = f'{args.max__MB}MB'
+    max_ = {i: max_ for i in range(n_gpus)}
 
     if args.full_finetune: assert args.bits in [16, 32]
     device_map = {"": "cuda:" + str(int(os.environ.get("LOCAL_RANK") or 0))}
@@ -267,7 +267,7 @@ def get_accelerate_model(args, checkpoint_dir):
         load_in_4bit=args.bits == 4,
         load_in_8bit=args.bits == 8,
         device_map='auto',
-        max_memory=max_memory,
+        max_=max_,
         quantization_config=BitsAndBytesConfig(
             load_in_4bit=args.bits == 4,
             load_in_8bit=args.bits == 8,
@@ -587,7 +587,7 @@ def train():
     args = argparse.Namespace(
         **vars(model_args), **vars(data_args), **vars(training_args)
     )
-    args.do_Eval=True
+    args.do_eval=True
 
     checkpoint_dir, completed_training = get_last_checkpoint(args.output_dir)
     if completed_training:
